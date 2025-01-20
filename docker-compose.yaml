@@ -1,25 +1,15 @@
-version: '27'
 services:
   eureka-discovery-service:
     container_name: eureka-discovery-service
     build:
-      context: eureka-discovery-service
-      dockerfile: Dockerfile
-    image: eureka-discovery-service:latest
-    ports:
-      - 8081:8081
-    networks:
-      - spring-cloud-network
+      context: ../eureka-discovery-service
+
   gateway-service:
     container_name: gateway-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
     build:
-      context: gateway-service
-      dockerfile: Dockerfile
-    image: gateway-service:latest
-    ports:
-      - 8080:8080
-    networks:
-      - spring-cloud-network
-networks:
-  spring-cloud-network:
-    driver: bridge
+      context: ../gateway-service
+    depends_on:
+      eureka-discovery-service:
+        condition: service_started
