@@ -8,10 +8,11 @@ services:
       - "8081:8082"
     networks:
       network:
-        ipv4_address: 192.168.100.2
     depends_on:
       eureka-discovery-service:
         condition: service_started
+    volumes:
+      - ../../../Tools/docker/volumes/keycloak/data/h2/:/opt/keycloak/data/h2
 
   eureka-discovery-service:
     container_name: eureka-discovery-service
@@ -24,6 +25,8 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
     build:
       context: ../gateway-service
+    ports:
+      - "8080:8080"
     depends_on:
       keycloak:
         condition: service_started
@@ -33,7 +36,3 @@ services:
 networks:
   network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.100.0/24
-          gateway: 192.168.100.1
