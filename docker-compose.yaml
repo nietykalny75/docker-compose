@@ -5,9 +5,9 @@ services:
       context: .
       dockerfile: keycloak.Dockerfile
     ports:
-      - "8081:8082"
+      - "8090:8090"
     networks:
-      network:
+      - backend
     depends_on:
       eureka-discovery-service:
         condition: service_started
@@ -18,6 +18,10 @@ services:
     container_name: eureka-discovery-service
     build:
       context: ../eureka-discovery-service
+    ports:
+      - "8081:8081"
+    networks:
+      - backend
 
   gateway-service:
     container_name: gateway-service
@@ -27,12 +31,28 @@ services:
       context: ../gateway-service
     ports:
       - "8080:8080"
+    networks:
+      - backend
     depends_on:
       keycloak:
         condition: service_started
       eureka-discovery-service:
         condition: service_started
 
+  user-service:
+    container_name: user-service
+    #    environment:
+    #      - SPRING_PROFILES_ACTIVE=dev
+    build:
+      context: ../user-service
+    networks:
+      - backend
+    depends_on:
+      gateway-service:
+        condition: service_started
+      eureka-discovery-service:
+        condition: service_started
+
 networks:
-  network:
+  backend:
     driver: bridge
